@@ -170,7 +170,7 @@ void test::XuLyThemGD() {
     int maCTGD = 1;
     while(true){
         cout << "---THEM CHI TIET GIAO DICH---\n";
-        cout << "\nDanh sach vi:";
+        cout << "Danh sach vi:\n";
         for (size_t i = 0; i < dm.dsVi.get_size(); ++i) {
                cout << dm.dsVi[i].getMaVi() << " | "
                     << dm.dsVi[i].getTenVi() << " | "
@@ -178,7 +178,7 @@ void test::XuLyThemGD() {
            }
         int maVi = getIntInput("Nhap ma vi: ");
 
-        cout << "\nDanh sach danh muc:";
+        cout << "Danh sach danh muc:\n";
         for (size_t i = 0; i < dm.dsDanhMuc.get_size(); ++i) {
                DanhMuc* dmuc = dm.dsDanhMuc[i];
                cout << dmuc->getMaDM() << " | "
@@ -191,15 +191,17 @@ void test::XuLyThemGD() {
 
         long long soTienGD = getIntInput("Nhap so tien giao dich: ");
 
-        ChiTietGD ctgd(maGD, maCTGD, maVi, maDM, moTa, soTienGD, 0);
-        dm.themChiTietGD(ctgd);
+        ChiTietGD ctgd(maGD, maCTGD, maVi, maDM, moTa, soTienGD);
+        bool ok = dm.themChiTietGD(ctgd);
+        if (ok) {
+            gd.getDanhSachChiTiet().push_back(*dm.dsChiTietGD[dm.dsChiTietGD.get_size()-1]);
+        } else {
+            cout << "Them chi tiet giao dich that bai!\n";
+        }
         maCTGD++;
-
         string ans = getStringInput("Them chi tiet giao dich khac? (y/n): ");
-        if (ans != "n" && ans != "N") break;
+        if (ans == "n" || ans == "N") break;
     }
-    gd.capNhatTongTien();
-    gd.tinhTongSoDu(dm.getDsViPtr());
     dm.dsGiaoDich.push_back(gd);
     dm.saveDataNguoiDung(nguoiDungHienTai);
 }

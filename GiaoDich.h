@@ -8,52 +8,52 @@ class GiaoDich {
 private:
     string thoiGian;
     string maGD;
+    long long tongTien = 0;
     MyVector<ChiTietGD> danhSachChiTiet;
-    long long tongTien;
-    long long tongSoDu;
+    //long long tongSoDu;
 
     string taoMaGD(const string& time) {
         if (time.size() != 10) return "";
         return time.substr(0,4) + time.substr(5,2) + time.substr(8,2);
     }
 public:
-    GiaoDich() : tongTien(0.0) {}
+    GiaoDich(){};
     GiaoDich(const string& time)
-        : thoiGian(time), tongTien(0.0)
+        : thoiGian(time)
     {
         maGD = taoMaGD(time);
     }
-    GiaoDich(const string& _thoiGian, const string& _maGD, long long _tongTien, long long _soDu)
-    : thoiGian(_thoiGian), maGD(_maGD), tongTien(_tongTien), tongSoDu(_soDu) {}
+    GiaoDich(const string& _thoiGian, const string& _maGD, long long _tongTien)
+    : thoiGian(_thoiGian), maGD(_maGD), tongTien(_tongTien) {}
 
 
     string getMaGD() const { return maGD; }
     string getThoiGian() const { return thoiGian; }
-    long long getTongTien() const { return tongTien; }
-    long long getTongSoDu() const {return tongSoDu;}
+    long long getTongTien() const{
+        long long total = 0;
+        for (size_t i = 0; i < danhSachChiTiet.get_size(); ++i) {
+            if (danhSachChiTiet[i].getDanhMuc()->getLoaiDM() == "Chi") {
+                total -= danhSachChiTiet[i].getSoTienGD();
+            } else {
+                total += danhSachChiTiet[i].getSoTienGD();
+            }
+        }
+        return total;
+    }
+    //long long getTongSoDu() const {return tongSoDu;}
     int getSoLuongChiTiet() const { return danhSachChiTiet.get_size(); }
     const MyVector<ChiTietGD>& getDanhSachChiTiet() const { return danhSachChiTiet; }
     MyVector<ChiTietGD>& getDanhSachChiTiet() { return danhSachChiTiet; }
 
     void setThoiGian(string _tg) {thoiGian = _tg;}
 
-    void capNhatTongTien() {
-        tongTien = 0;
-        for (size_t i = 0; i < danhSachChiTiet.get_size(); ++i) {
-            danhSachChiTiet[i].capNhatSoDuVi(0);
-            if (danhSachChiTiet[i].getDanhMuc()->getLoaiDM() == "Chi") {
-                tongTien -= danhSachChiTiet[i].getSoTienGD();
-            } else {
-                tongTien += danhSachChiTiet[i].getSoTienGD();
-            }
-        }  
-    }
+    
 
-    void tinhTongSoDu(const MyVector<Vi*>& dsVi) {
+    /*void tinhTongSoDu(const MyVector<Vi*>& dsVi) {
         tongSoDu = 0;
         for (size_t i = 0; i < dsVi.get_size(); ++i) {
             tongSoDu += dsVi[i]->getSoDu();
         }
-    }
+    }*/
 };
 

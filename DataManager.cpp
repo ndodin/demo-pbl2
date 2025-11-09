@@ -22,8 +22,9 @@ void DataManager::default_user_folder(const string& userFolder) {
    if (fdm.is_open()) {
        fdm << "1,An uong,Chi\n";
        fdm << "2,Di lai,Chi\n";
-       fdm << "3,Luong,Thu\n";
-       fdm << "4,Mua sam,Chi\n";
+       fdm << "3,Mua sam,Chi\n";
+       fdm << "4,Luong,Thu\n";
+       fdm << "5,Khac,Thu\n";
        fdm.close();
    }
 
@@ -95,13 +96,12 @@ void DataManager::loadGiaoDich(const string& tenFile, MyVector<GiaoDich>& dsGiao
    while (getline(fin, line)) {
        if (line.empty()) continue;
        stringstream ss(line);
-       string thoiGian, maGD, tongTienStr, tongSoDuStr;
+       string thoiGian, maGD, tongTienStr;
        getline(ss, thoiGian, ',');
        getline(ss, maGD, ',');
        getline(ss, tongTienStr, ','); long long tongTien = stoll(tongTienStr);
-       getline(ss, tongSoDuStr, ','); long long tongSoDu= stoll(tongSoDuStr);
 
-       dsGiaoDich.push_back(GiaoDich(thoiGian,maGD, tongTien, tongSoDu));
+       dsGiaoDich.push_back(GiaoDich(thoiGian,maGD,tongTien));
    }
    fin.close();
 }
@@ -113,16 +113,15 @@ void DataManager::loadChiTietGD(const string& tenFile, MyVector<ChiTietGD*>& dsC
    while (getline(fin, line)) {
        if (line.empty()) continue;
        stringstream ss(line);
-       string maGD, maCTGDStr, maViStr, maDMStr, moTa, soTienGDStr, soDuViStr;
+       string maGD, maCTGDStr, maViStr, maDMStr, moTa, soTienGDStr;
        getline(ss, maGD, ',');
        getline(ss, maCTGDStr, ','); int maCTGD = stoi(maCTGDStr);
        getline(ss, maViStr, ','); int maVi = stoi(maViStr);
        getline(ss, maDMStr, ','); int maDM = stoi(maDMStr);
        getline(ss, moTa, ',');
        getline(ss, soTienGDStr, ','); long long soTienGD = stoll(soTienGDStr);
-       getline(ss, soDuViStr, ','); long long soDuVi = stoll(soDuViStr);
 
-       dsChiTietGD.push_back(new ChiTietGD(maGD, maCTGD, maVi, maDM, moTa, soTienGD, soDuVi));
+       dsChiTietGD.push_back(new ChiTietGD(maGD, maCTGD, maVi, maDM, moTa, soTienGD));
 
        /*for (auto& v : dsVi)
            if (v->getMaVi() == maVi) { viPtr = v; break; }
@@ -140,7 +139,19 @@ void DataManager::loadChiTietGD(const string& tenFile, MyVector<ChiTietGD*>& dsC
    fin.close();
 }
 
-   void DataManager::saveNguoiDung(const string& tenFile, MyVector<NguoiDung>& dsNguoiDung){
+void DataManager::ganChiTietChoGiaoDich() {
+    for (size_t i = 0; i < dsGiaoDich.get_size(); ++i) {
+        GiaoDich& gd = dsGiaoDich[i];
+        for (size_t j = 0; j < dsChiTietGD.get_size(); ++j) {
+            ChiTietGD* ct = dsChiTietGD[j];
+            if (ct->getMaGD() == gd.getMaGD()) {
+                gd.getDanhSachChiTiet().push_back(*ct);
+            }
+        }
+    }
+}
+
+void DataManager::saveNguoiDung(const string& tenFile, MyVector<NguoiDung>& dsNguoiDung){
        ofstream fout(tenFile, ios::trunc);
        if (!fout.is_open()) return;
        for(size_t i = 0; i < dsNguoiDung.get_size();i++){
@@ -182,10 +193,9 @@ void DataManager::loadChiTietGD(const string& tenFile, MyVector<ChiTietGD*>& dsC
        if (!fout.is_open()) return;
        for(size_t i = 0; i < dsGiaoDich.get_size();i++){
            const GiaoDich& gd = dsGiaoDich[i];
-           fout << gd.getMaGD() << ","
-                << gd.getThoiGian() << ","
-                << gd.getTongTien() << ","
-                << gd.getTongSoDu();
+           fout << gd.getThoiGian() << ","
+                << gd.getMaGD() << ","
+                << gd.getTongTien();
            if(i<dsGiaoDich.get_size()-1) fout <<"\n";
        }
        fout.close();
@@ -200,8 +210,7 @@ void DataManager::loadChiTietGD(const string& tenFile, MyVector<ChiTietGD*>& dsC
                 << ct->getMaVi() << ","
                 << ct->getMaDM() << ","
                 << ct->getMoTa() << ","
-                << ct->getSoTienGD() << ","
-                << ct->getSoDuVi();
+                << ct->getSoTienGD();
            if(i<dsChiTietGD.get_size()-1) fout <<"\n";
        }
        fout.close();
@@ -256,6 +265,7 @@ void DataManager::loadChiTietGD(const string& tenFile, MyVector<ChiTietGD*>& dsC
        loadDanhMuc(userFolder + "danhmuc.txt", dsDanhMuc);
        loadGiaoDich(userFolder + "giaodich.txt", dsGiaoDich);
        loadChiTietGD(userFolder + "chitietgd.txt", dsChiTietGD);
+        ganChiTietChoGiaoDich();
        return true;
    }
 
@@ -289,7 +299,7 @@ void DataManager::XoaTaiKhoan(int index)
     dsNguoiDung.erase(index);
 }
 
-bool DataManager::themChiTietGD(const ChiTietGD& ctgd) {
+bool DataManager::themChiTietGD(const ChiTietGD& ctgd){
     ChiTietGD* newCtgd = new ChiTietGD(ctgd);
     Vi* viPtr = nullptr;
     for (size_t i = 0; i < dsVi.get_size(); ++i) {
@@ -322,7 +332,12 @@ bool DataManager::themChiTietGD(const ChiTietGD& ctgd) {
         viPtr->truTien(ctgd.getSoTienGD());
     else
         viPtr->congTien(ctgd.getSoTienGD());
-    
+    for(size_t i = 0; i < dsGiaoDich.get_size(); ++i) {
+        if (dsGiaoDich[i].getMaGD() == ctgd.getMaGD()) {
+            dsGiaoDich[i].getDanhSachChiTiet().push_back(*newCtgd);
+            break;
+        }
+    }
     dsChiTietGD.push_back(newCtgd);
     return true;
 }

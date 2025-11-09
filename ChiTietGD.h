@@ -22,9 +22,9 @@ public:
           soTienGD(0), soDuVi(0), vi(nullptr), danhMuc(nullptr) {}
 
     ChiTietGD(const string& _maGD, int _maCTGD, int _maVi, int _maDM,
-              const string& _moTa, long long _soTienGD, long long _soDuVi)
+              const string& _moTa, long long _soTienGD)
         : maGD(_maGD), maCTGD(_maCTGD), maVi(_maVi), maDM(_maDM),
-          moTa(_moTa), soTienGD(_soTienGD), soDuVi(_soDuVi),
+          moTa(_moTa), soTienGD(_soTienGD),
           vi(nullptr), danhMuc(nullptr) {}
     
     string getMaGD() const { return maGD; }

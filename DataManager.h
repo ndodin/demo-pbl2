@@ -43,6 +43,7 @@ public:
    void loadDanhMuc(const string& tenFile, MyVector<DanhMuc*>& dsDanhMuc);
    void loadGiaoDich(const string& tenFile, MyVector<GiaoDich>& dsGiaoDich);
    void loadChiTietGD(const string& tenFile, MyVector<ChiTietGD*>& dsChiTietGD);
+   void ganChiTietChoGiaoDich();
 
 
    void saveNguoiDung(const string& tenFile, MyVector<NguoiDung>& dsNguoiDung);
